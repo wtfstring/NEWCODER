@@ -19,5 +19,7 @@ C:\Program Files\Git\cmd\git.exe
 创建新的文档以后文档以后就可以保存提交了
 暂时还没研究出怎么提交，但是在右上角有两个按钮，
 都是VSC，一个向上箭头一个向下箭头，向上的就是提交了
+提交时选择commit and push ,可一次提交到远端，选择commit，只提交到本地，
+或者选择VCS-Git-Add,先把文件放入暂存区，然后再commit and push
 后面的就交给你自己了
 '''
