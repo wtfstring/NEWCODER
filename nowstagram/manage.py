@@ -22,7 +22,7 @@ def init_database():
         db.session.add(User('User' + str(i+1),'a' + str(i)))
         for j in range(0,10):  #为每个人创建10张图片,为了演示AJAX(异步加载)，原来是三张
             db.session.add(Image(get_image_url(),i + 1))
-            for k in range(0,3): #为图片加三个评论
+            for k in range(0,3): #为每张图片加三个评论
                 db.session.add(Comment('This is a comment ' + str(k),1+3*i+j,i+1))
     db.session.commit()
 
