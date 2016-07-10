@@ -1,16 +1,48 @@
 # -*- encoding=UTF-8 -*-
 
 from nowstagram import app,db
-from models import Image,User
-from flask import render_template,redirect,request,flash,get_flashed_messages
-import random,hashlib,json #给密码加盐,再用MD5方法加密
+from models import Image,User,Comment
+from flask import render_template,redirect,request,flash,get_flashed_messages,send_from_directory
+import random,hashlib,json,uuid,os #给密码加盐,再用MD5方法加密
 from flask_login import login_user,logout_user,current_user,login_required
+import string
 
+from qiniusdk import qiniu_upload_file
+
+#首页
 @app.route('/')
 def index():
-    images = Image.query.order_by('id desc').limit(10).all() #降序排列图片，选出10张图片作为首页的图片
-    return render_template('index.html',images=images)  #把图片传进去
+    images = Image.query.order_by('id desc').limit(20).all() #降序排列图片，选出10张图片作为首页的图片
+    paginate = Image.query.order_by('id desc').paginate(page=1,per_page=10,error_out=False)
+    #return render_template('index.html',images=images)  #把图片传进去
+    return render_template('index.html',images=paginate.items,has_next=paginate.has_next)  #把图片传进去
 
+#首页的“更多命令”
+@app.route('/index/images/<int:page>/<int:per_page>/')
+def index_images(page, per_page):
+    paginate = Image.query.order_by(db.desc(Image.id)).paginate(page=page, per_page=per_page, error_out=False)
+    map = {'has_next': paginate.has_next}
+    images = []
+    for image in paginate.items:
+        comments = []
+        for i in range(0, min(2, len(image.comments))):
+            comment = image.comments[i]
+            comments.append({'username':comment.user.username,
+                             'user_id':comment.user_id,
+                             'content':comment.content})
+        imgvo = {'id': image.id,
+                 'url': image.url,
+                 'comment_count': len(image.comments),
+                 'user_id': image.user_id,
+                 'head_url':image.user.head_url,
+                 'created_date':str(image.create_date),
+                 'comments':comments}
+        images.append(imgvo)
+
+    map['images'] = images
+    return json.dumps(map)
+
+#图片详情页面
 @app.route('/image/<int:image_id>/')
 def image(image_id):
     image = Image.query.get(image_id)
@@ -30,7 +62,7 @@ def profile(user_id):
     paginate = Image.query.filter_by(user_id=user_id).paginate(page=1,per_page=3,error_out=False)
     return render_template('profile.html',user=user,images=paginate.items,has_next=paginate.has_next)
 
-#AJAX异步请求接口
+#AJAX异步请求接口，用户个人页面的“更多”的功能
 @app.route('/profile/images/<int:user_id>/<int:page>/<int:per_page>/')
 def user_images(user_id,page,per_page):
     paginate = Image.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page, error_out=False)
@@ -49,9 +81,10 @@ def regloginpage():
     msg = ''
     for m in get_flashed_messages(with_categories=False,category_filter=['reglogin']):
         msg = msg + m
+    #使用 render_template() 方法可以渲染模板
     return render_template('login.html',msg=msg,next=request.values.get('next'))  #登录后通过next回到之前访问的页面
 
-
+#注册时的错误处理函数
 def redirect_with_msg(target,msg,category):
     if msg != None:
         flash(msg,category=category)
@@ -86,6 +119,14 @@ def login():
 
     return redirect('/')
 
+
+#检测字符串中是否包含某字符集合中的字符
+def containAny(seq,charset):
+    for c in seq:
+        if c not in charset:
+            return False;
+    return True
+
 #注册
 @app.route('/reg/',methods={'post','get'})
 def reg():
@@ -96,6 +137,14 @@ def reg():
 
     if username == '' or password == '':
         return redirect_with_msg('/regloginpage', u'用户名或密码不能为空', 'reglogin')
+
+    if len(username) < 5  and len(username) > 16: #用户名长度应该大于4
+        return redirect_with_msg('/regloginpage',u'用户名长度应该大于4小于16','reglogin')
+
+    str1 = ''
+    str1 += string.letters + '_' + string.digits
+    if not containAny(username,str1):
+        return redirect_with_msg('/regloginpage',u'用户名只能包含字母或者数字或者下划线','reglogin')
 
     user = User.query.filter_by(username=username).first()
     if user != None:
@@ -126,4 +175,48 @@ def logout():
     logout_user()
     return redirect('/')
 
+#保存图片在本地,返回上传图片的url
+def save_to_local(file,file_name):
+    save_dir = app.config['UPLOAD_DIR']
+    file.save(os.path.join(save_dir,file_name))
+    return '/image/' + file_name
 
+#图片的访问地址
+@app.route('/image/<image_name>')
+def view_image(image_name):
+    #send_from_directory把文件作为二进制流（http协议头中，不同的文件之前通过boundary分开）发送
+    return send_from_directory(app.config['UPLOAD_DIR'],image_name)
+
+#图片上传,而图片的限定格式、保存的位置目录等配置文件应该写在配置文件中
+@app.route('/upload/',methods={"post"})  #提交一张图片
+@login_required
+def upload():
+    #print request.files
+    file = request.files['file']  #得到上传的文件
+    #print dir(file)  # dir()函数返回任意对象的属性和方法列表
+    #return 'ok'
+    file_ext = ''
+    if file.filename.find('.') > 0:  #鉴定文件名是否符合要求
+        file_ext = file.filename.rsplit('.',1)[1].strip().lower()  #取出后缀名
+    if file_ext in app.config['ALLOWED_EXIT']:
+        file_name = str(uuid.uuid1()).replace('-', '') + '.' + file_ext  #上传的文件名
+        #url = save_to_local(file,file_name)  #保存到本地
+        url = qiniu_upload_file(file,file_name)
+        if url != None:  #将图片加入数据库
+            db.session.add(Image(url, current_user.id))
+            db.session.commit()
+
+    return redirect('/profile/%d' % current_user.id)
+
+#图片详情页的评论
+@app.route('/addcomment/',methods={'post'})
+def add_comment():
+    image_id = int(request.values['image_id'])
+    content = request.values['content'].strip()
+    comment = Comment(content,image_id,current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+    return json.dumps({"code":0,"id":comment.id,
+                       "content":content,
+                       "username":comment.user.username,
+                       "user_id":comment.user.id})

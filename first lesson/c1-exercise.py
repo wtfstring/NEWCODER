@@ -4,6 +4,7 @@ import re
 '''用BeautifulSoup爬取糗事百科的笑话'''
 import requests
 from bs4 import BeautifulSoup
+from requests import request
 
 def qiushibaikeSpider():
     content = requests.get('http://www.qiushibaike.com').content
@@ -109,4 +110,5 @@ if __name__ == '__main__':
     #demo_operation()
     #demo_buildinfunction()
     #demo_random()
-    demo_re()
+    #demo_re()
+    print dir(request)

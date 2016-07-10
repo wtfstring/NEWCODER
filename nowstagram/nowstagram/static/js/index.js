@@ -1,3 +1,6 @@
+/**
+ * Created by wangtuanfei on 2016/7/10.
+ */
 $(function () {
     var oExports = {
         initialize: fInitialize,
@@ -18,7 +21,7 @@ $(function () {
         // 初始化数据
         that.uid = window.uid;
         that.page = 1;
-        that.pageSize = 3;
+        that.pageSize = 10;
         that.listHasNext = true;
         // 绑定事件
         $('.js-load-more').on('click', function (oEvent) {
@@ -58,15 +61,49 @@ $(function () {
                 var sHtml = '';
                 $.each(oResult.images, function (nIndex, oImage) {
                     sHtml += that.tpl([
-                        '<a class="item" href="/image/#{id}">',
-                            '<div class="img-box">',
-                                '<img src="#{url}">',
+                        '<article class="mod">',
+                            '<header class="mod-hd">',
+                                '<time class="time">#{created_date}</time>',
+                                '<a href="/profile/#{user_id}" class="avatar">',
+                                    '<img src="#{head_url}">',
+                                '</a>',
+                                '<div class="profile-info">',
+                                    '<a title="#{user_id}" href="/profile/#{user_id}">#{username}</a>',
+                                '</div>',
+                            '</header>',
+                            '<div class="mod-bd">',
+                                '<div class="img-box">',
+                                    '<a href="/image/#{id}">',
+                                        '<img src="#{url}">',
+                                    '</a>',
+                                '</div>',
                             '</div>',
-                            '<div class="img-mask"></div>',
-                            '<div class="interaction-wrap">',
-                                '<div class="interaction-item"><i class="icon-comment"></i>#{comment_count}</div>',
+                            '<div class="mod-ft">',
+                                '<ul class="discuss-list">',
+                                    '<li class="more-discuss">',
+                                        '<a>',
+                                            '<span>全部 </span><span class="">#{comment_count}</span>',
+                                            '<span> 条评论</span></a>',
+                                    '</li>',
+                                    '{% for comment in image.comments %}',
+                                    '{% if loop.index > 2 %} {% break %} {% endif %}',
+                                    '<li>',
+                                        '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{id}">#{username}</a>',
+                                        '<span>',
+                                            '<span>#{content}</span>',
+                                        '</span>',
+                                    '</li>',
+                                    '{% endfor %}',
+                                '</ul>',
+                                '<section class="discuss-edit">',
+                                    '<a class="icon-heart"></a>',
+                                    '<form>',
+                                        '<input placeholder="添加评论..." type="text">',
+                                    '</form>',
+                                    'button class="more-info">更多选项</button>',
+                                '</section>',
                             '</div>',
-                        '</a>'].join(''), oImage);
+                        '</article>'].join(''), oImage);
                 });
                 sHtml && that.listEl.append(sHtml);
             },
@@ -79,7 +116,7 @@ $(function () {
 
     function fRequestData(oConf) {
         var that = this;
-        var sUrl = '/profile/images/' + oConf.uid + '/' + oConf.page + '/' + oConf.pageSize + '/';
+        var sUrl = '/profile/images/' + oConf.page + '/' + oConf.pageSize + '/';
         $.ajax({url: sUrl, dataType: 'json'}).done(oConf.call).fail(oConf.error).always(oConf.always);
     }
 
