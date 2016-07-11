@@ -12,7 +12,7 @@ from qiniusdk import qiniu_upload_file
 #首页
 @app.route('/')
 def index():
-    images = Image.query.order_by('id desc').limit(20).all() #降序排列图片，选出10张图片作为首页的图片
+    images = Image.query.order_by('id desc').limit(30).all() #降序排列图片，选出10张图片作为首页的图片
     paginate = Image.query.order_by('id desc').paginate(page=1,per_page=10,error_out=False)
     #return render_template('index.html',images=images)  #把图片传进去
     return render_template('index.html',images=paginate.items,has_next=paginate.has_next)  #把图片传进去

@@ -68,7 +68,7 @@ $(function () {
                                     '<img src="#{head_url}">',
                                 '</a>',
                                 '<div class="profile-info">',
-                                    '<a title="#{user_id}" href="/profile/#{user_id}">#{username}</a>',
+                                    '<a title="#{username}" href="/profile/#{user_id}">#{username}</a>',
                                 '</div>',
                             '</header>',
                             '<div class="mod-bd">',
@@ -78,6 +78,7 @@ $(function () {
                                     '</a>',
                                 '</div>',
                             '</div>',
+
                             '<div class="mod-ft">',
                                 '<ul class="discuss-list">',
                                     '<li class="more-discuss">',
@@ -85,22 +86,24 @@ $(function () {
                                             '<span>全部 </span><span class="">#{comment_count}</span>',
                                             '<span> 条评论</span></a>',
                                     '</li>',
-                                    '{% for comment in image.comments %}',
-                                    '{% if loop.index > 2 %} {% break %} {% endif %}',
+                                    /**
+                                   '{ for comment in image.comments }',
+                                    '{ if loop.index > 2 } { break } { endif }',
                                     '<li>',
                                         '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{id}">#{username}</a>',
                                         '<span>',
                                             '<span>#{content}</span>',
                                         '</span>',
                                     '</li>',
-                                    '{% endfor %}',
+                                    '{ endfor }',
+                                     ***/
                                 '</ul>',
                                 '<section class="discuss-edit">',
                                     '<a class="icon-heart"></a>',
                                     '<form>',
                                         '<input placeholder="添加评论..." type="text">',
                                     '</form>',
-                                    'button class="more-info">更多选项</button>',
+                                    '<button class="more-info">更多选项</button>',
                                 '</section>',
                             '</div>',
                         '</article>'].join(''), oImage);
@@ -116,7 +119,7 @@ $(function () {
 
     function fRequestData(oConf) {
         var that = this;
-        var sUrl = '/profile/images/' + oConf.page + '/' + oConf.pageSize + '/';
+        var sUrl = '/index/images/' + oConf.page + '/' + oConf.pageSize + '/';
         $.ajax({url: sUrl, dataType: 'json'}).done(oConf.call).fail(oConf.error).always(oConf.always);
     }
 
