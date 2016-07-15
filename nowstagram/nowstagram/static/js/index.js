@@ -21,7 +21,7 @@ $(function () {
         // 初始化数据
         that.uid = window.uid;
         that.page = 1;
-        that.pageSize = 10;
+        that.pageSize = 5;
         that.listHasNext = true;
         // 绑定事件
         $('.js-load-more').on('click', function (oEvent) {
@@ -58,9 +58,9 @@ $(function () {
                 // 更新当前页面
                 that.page++;
                 // 渲染数据
-                var sHtml = '';
+                var sHtm1 = '';
                 $.each(oResult.images, function (nIndex, oImage) {
-                    sHtml += that.tpl([
+                    sHtm1 += that.tpl([
                         '<article class="mod">',
                             '<header class="mod-hd">',
                                 '<time class="time">#{created_date}</time>',
@@ -86,17 +86,14 @@ $(function () {
                                             '<span>全部 </span><span class="">#{comment_count}</span>',
                                             '<span> 条评论</span></a>',
                                     '</li>',
-                                    /**
-                                   '{ for comment in image.comments }',
-                                    '{ if loop.index > 2 } { break } { endif }',
+                                        /*
                                     '<li>',
-                                        '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{id}">#{username}</a>',
+                                        '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{id}" data-reactid=".0.1.0.0.0.2.1.2:$comment-17856951190001917.1">#{username}</a>',
                                         '<span>',
                                             '<span>#{content}</span>',
                                         '</span>',
                                     '</li>',
-                                    '{ endfor }',
-                                     ***/
+                                    */
                                 '</ul>',
                                 '<section class="discuss-edit">',
                                     '<a class="icon-heart"></a>',
@@ -108,7 +105,8 @@ $(function () {
                             '</div>',
                         '</article>'].join(''), oImage);
                 });
-                sHtml && that.listEl.append(sHtml);
+                sHtm1 && that.listEl.append(sHtm1);
+
             },
             error: function () {
                 alert('出现错误，请稍后重试');

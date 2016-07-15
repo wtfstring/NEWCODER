@@ -12,8 +12,8 @@ from qiniusdk import qiniu_upload_file
 #首页
 @app.route('/')
 def index():
-    images = Image.query.order_by('id desc').limit(30).all() #降序排列图片，选出10张图片作为首页的图片
-    paginate = Image.query.order_by('id desc').paginate(page=1,per_page=10,error_out=False)
+    images = Image.query.order_by(db.desc(Image.id)).limit(10).all() #降序排列图片，选出10张图片作为首页的图片
+    paginate = Image.query.order_by(db.desc(Image.id)).paginate(page=1,per_page=5,error_out=False)
     #return render_template('index.html',images=images)  #把图片传进去
     return render_template('index.html',images=paginate.items,has_next=paginate.has_next)  #把图片传进去
 
@@ -44,11 +44,13 @@ def index_images(page, per_page):
 
 #图片详情页面
 @app.route('/image/<int:image_id>/')
+@login_required
 def image(image_id):
     image = Image.query.get(image_id)
     if image == None:
         return redirect('/') #跳转到首页index页面
-    return render_template('pageDetail.html',image=image)
+    comments = Comment.query.filter_by(image_id=image_id).order_by(db.desc(Comment.id)).limit(20).all()
+    return render_template('pageDetail.html',image=image, comments=comments)
 
 #用户个人页面
 @app.route('/profile/<int:user_id>/')
@@ -59,13 +61,13 @@ def profile(user_id):
         return redirect('/')
 
     # 演示AJAX(异步加载，不刷新页面，加载数据)查找用户的所有图片,分页，每页三个,没有也不报错
-    paginate = Image.query.filter_by(user_id=user_id).paginate(page=1,per_page=3,error_out=False)
+    paginate = Image.query.filter_by(user_id=user_id).order_by(db.desc(Image.id)).paginate(page=1,per_page=3,error_out=False)
     return render_template('profile.html',user=user,images=paginate.items,has_next=paginate.has_next)
 
 #AJAX异步请求接口，用户个人页面的“更多”的功能
 @app.route('/profile/images/<int:user_id>/<int:page>/<int:per_page>/')
 def user_images(user_id,page,per_page):
-    paginate = Image.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page, error_out=False)
+    paginate = Image.query.filter_by(user_id=user_id).order_by(db.desc(Image.id)).paginate(page=page, per_page=per_page, error_out=False)
     map ={'has_next':paginate.has_next}
     images = []
     for image in paginate.items:
@@ -138,7 +140,8 @@ def reg():
     if username == '' or password == '':
         return redirect_with_msg('/regloginpage', u'用户名或密码不能为空', 'reglogin')
 
-    if len(username) < 5  and len(username) > 16: #用户名长度应该大于4
+    lengthofusername = len(username)
+    if lengthofusername < 5 or lengthofusername > 16: #用户名长度应该大于4
         return redirect_with_msg('/regloginpage',u'用户名长度应该大于4小于16','reglogin')
 
     str1 = ''
