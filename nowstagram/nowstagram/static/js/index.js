@@ -78,7 +78,7 @@ $(function () {
                                     '</a>',
                                 '</div>',
                             '</div>',
-
+                        
                             '<div class="mod-ft">',
                                 '<ul class="discuss-list">',
                                     '<li class="more-discuss">',
@@ -86,14 +86,27 @@ $(function () {
                                             '<span>全部 </span><span class="">#{comment_count}</span>',
                                             '<span> 条评论</span></a>',
                                     '</li>',
-                                        /*
-                                    '<li>',
-                                        '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{id}" data-reactid=".0.1.0.0.0.2.1.2:$comment-17856951190001917.1">#{username}</a>',
+                    /* ].join(''),oImage);
+
+                               // var sHtm2 = '';
+                               // for(var ni = 0; ni < oImage.comment_count; ni++) {
+                                   // dict = {'username':oImage.username[ni],
+                                  //      'user_id':oImage.user_id[ni],
+                                   //      'content':oImage.content[ni]
+                                   // };
+                                   sHtm2 += that.tp1([
+                                        '<li>',
+                                        '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{user_id}" data-reactid=".0.1.0.0.0.2.1.2:$comment-17856951190001917.1">#{username}</a>',
                                         '<span>',
-                                            '<span>#{content}</span>',
+                                        '<span>#{content}</span>',
                                         '</span>',
-                                    '</li>',
-                                    */
+                                        '</li>',
+                                   // ].join(''), dict);
+                                //}
+
+                               //var sHtm3 = '';
+                               //sHtm3 = that.tp1([
+                        */
                                 '</ul>',
                                 '<section class="discuss-edit">',
                                     '<a class="icon-heart"></a>',
