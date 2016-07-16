@@ -1,6 +1,3 @@
-/**
- * Created by wangtuanfei on 2016/7/10.
- */
 $(function () {
     var oExports = {
         initialize: fInitialize,
@@ -59,22 +56,24 @@ $(function () {
                 that.page++;
                 // 渲染数据
                 var sHtm1 = '';
+                var sHtm2 = '';
+                var sHtm3 = '';
                 $.each(oResult.images, function (nIndex, oImage) {
                     sHtm1 += that.tpl([
                         '<article class="mod">',
                             '<header class="mod-hd">',
                                 '<time class="time">#{created_date}</time>',
-                                '<a href="/profile/#{user_id}" class="avatar">',
-                                    '<img src="#{head_url}">',
+                                '<a href="/profile/#{image_user_id}" class="avatar">',
+                                    '<img src="#{image_user_head_url}">',
                                 '</a>',
                                 '<div class="profile-info">',
-                                    '<a title="#{username}" href="/profile/#{user_id}">#{username}</a>',
+                                    '<a title="#{image_user_username}" href="/profile/#{image_user_id}">#{image_user_username}</a>',
                                 '</div>',
                             '</header>',
                             '<div class="mod-bd">',
                                 '<div class="img-box">',
-                                    '<a href="/image/#{id}">',
-                                        '<img src="#{url}">',
+                                    '<a href="/image/#{image_id}">',
+                                        '<img src="#{image_url}">',
                                     '</a>',
                                 '</div>',
                             '</div>',
@@ -86,27 +85,24 @@ $(function () {
                                             '<span>全部 </span><span class="">#{comment_count}</span>',
                                             '<span> 条评论</span></a>',
                                     '</li>',
-                    /* ].join(''),oImage);
+                            /*].join(''),oImage);
 
-                               // var sHtm2 = '';
-                               // for(var ni = 0; ni < oImage.comment_count; ni++) {
-                                   // dict = {'username':oImage.username[ni],
-                                  //      'user_id':oImage.user_id[ni],
-                                   //      'content':oImage.content[ni]
-                                   // };
+                                for(var ni = 0; ni < oImage.comment_count; ni++) {
+                                    dict = {'comment_username':oImage.comment_username[ni],
+                                        'comment_user_id':oImage.comment_user_id[ni],
+                                         'comment_content':oImage.comment_content[ni]
+                                    };
                                    sHtm2 += that.tp1([
                                         '<li>',
-                                        '<a class="_4zhc5 _iqaka" title="#{username}" href="/profile/#{user_id}" data-reactid=".0.1.0.0.0.2.1.2:$comment-17856951190001917.1">#{username}</a>',
+                                        '<a class="_4zhc5 _iqaka" title="#{comment_username}" href="/profile/#{comment_user_id}" data-reactid=".0.1.0.0.0.2.1.2:$comment-17856951190001917.1">#{comment_username}</a>',
                                         '<span>',
-                                        '<span>#{content}</span>',
+                                        '<span>#{comment_content}</span>',
                                         '</span>',
-                                        '</li>',
-                                   // ].join(''), dict);
-                                //}
+                                        '</li>'
+                                    ].join(''), dict);
+                                }
 
-                               //var sHtm3 = '';
-                               //sHtm3 = that.tp1([
-                        */
+                               sHtm3 = that.tp1([*/
                                 '</ul>',
                                 '<section class="discuss-edit">',
                                     '<a class="icon-heart"></a>',
@@ -116,8 +112,10 @@ $(function () {
                                     '<button class="more-info">更多选项</button>',
                                 '</section>',
                             '</div>',
-                        '</article>'].join(''), oImage);
+                        '</article>'].join(''),oImage);
+                    sHtm1 += sHtm2 + sHtm3;
                 });
+
                 sHtm1 && that.listEl.append(sHtm1);
 
             },
@@ -132,6 +130,13 @@ $(function () {
         var that = this;
         var sUrl = '/index/images/' + oConf.page + '/' + oConf.pageSize + '/';
         $.ajax({url: sUrl, dataType: 'json'}).done(oConf.call).fail(oConf.error).always(oConf.always);
+        $.getJSON('url', function(json) {
+            if (json.success) {
+                alert(json.data);
+            } else {
+                alert('AJAX请求失败,请刷新页面重试');
+    }
+});
     }
 
     function fTpl(sTpl, oData) {

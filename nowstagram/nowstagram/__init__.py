@@ -3,6 +3,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_mail import Mail
 
 #ORM 关系对象映射，实质是将关系数据库中的业务数据用对象的形式表示出来，并通过面向对的方式
     #将这些对象组织起来,而SQLAlchemy是流行的ORM框架
@@ -14,6 +15,9 @@ app.secret_key = 'nowcoder'
 db = SQLAlchemy(app)  #db 数据库
 login_manager = LoginManager(app)  #用户初始化
 login_manager.login_view = '/regloginpage/'  #如果用户没有登录，自定义跳到某个页面，这里跳到注册页面
+
+# 邮件是通过一个 Mail 实例进行管理
+mail = Mail(app)   #创建一个邮件实例
 
 from nowstagram import views,models
 

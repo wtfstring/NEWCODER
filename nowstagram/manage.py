@@ -6,6 +6,7 @@ from nowstagram.models import User,Image,Comment
 import random
 from sqlalchemy import or_,and_   #用于查询语句中条件的关联
 
+
 manager = Manager(app)
 
 def get_image_url():

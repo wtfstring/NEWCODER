@@ -1,46 +1,54 @@
 # -*- encoding=UTF-8 -*-
 
-from nowstagram import app,db
+from nowstagram import app,db,mail
 from models import Image,User,Comment
 from flask import render_template,redirect,request,flash,get_flashed_messages,send_from_directory
-import random,hashlib,json,uuid,os #给密码加盐,再用MD5方法加密
+import random,hashlib,json,uuid,os # 给密码加盐,再用MD5方法加密
 from flask_login import login_user,logout_user,current_user,login_required
 import string
+from flask_mail import Message
 
 from qiniusdk import qiniu_upload_file
 
-#首页
+# 首页
 @app.route('/')
 def index():
-    images = Image.query.order_by(db.desc(Image.id)).limit(10).all() #降序排列图片，选出10张图片作为首页的图片
-    paginate = Image.query.order_by(db.desc(Image.id)).paginate(page=1,per_page=5,error_out=False)
-    #return render_template('index.html',images=images)  #把图片传进去
-    return render_template('index.html',images=paginate.items,has_next=paginate.has_next)  #把图片传进去
+    images = Image.query.order_by(db.desc(Image.id)).limit(10).all()  # 降序排列图片，选出10张图片作为首页的图片
+    paginate = Image.query.order_by(db.desc(Image.id)).paginate(page=1, per_page=5, error_out=False)
+    # return render_template('index.html',images=images)  #把图片传进去
+    return render_template('index.html', images=paginate.items, has_next=paginate.has_next)  #把图片传进去
 
-#首页的“更多命令”
+# 首页的“更多命令”
 @app.route('/index/images/<int:page>/<int:per_page>/')
 def index_images(page, per_page):
     paginate = Image.query.order_by(db.desc(Image.id)).paginate(page=page, per_page=per_page, error_out=False)
-    map = {'has_next': paginate.has_next}
+    json_data = {'well done!':'shabibi','has_next': paginate.has_next}
     images = []
     for image in paginate.items:
-        comments = []
-        for i in range(0, min(2, len(image.comments))):
-            comment = image.comments[i]
-            comments.append({'username':comment.user.username,
-                             'user_id':comment.user_id,
-                             'content':comment.content})
-        imgvo = {'id': image.id,
-                 'url': image.url,
+        user = User.query.filter_by(id=image.user_id).first()
+        comments = Comment.query.filter_by(image_id=image.id).all()
+        comment_username = []
+        comment_user_id = []
+        comment_content = []
+        for c in comments:
+            comment_username.append(c.user.username)
+            comment_user_id.append(c.user_id)
+            comment_content.append(c.content)
+        imgvo = {'image_id': image.id,
+                 'image_url': image.url,
                  'comment_count': len(image.comments),
-                 'user_id': image.user_id,
-                 'head_url':image.user.head_url,
+                 'image_user_name': user.username,
+                 'image_user_id': user.id,
+                 'image_user_head_url':user.head_url,
+                 'comment_username':comment_username,
                  'created_date':str(image.create_date),
-                 'comments':comments}
+                 'comment_user_id':comment_user_id,
+                 'comment_content':comment_content
+                 }
         images.append(imgvo)
 
-    map['images'] = images
-    return json.dumps(map)
+    json_data['images'] = images
+    return json.dumps(json_data)
 
 #图片详情页面
 @app.route('/image/<int:image_id>/')
@@ -86,13 +94,13 @@ def regloginpage():
     #使用 render_template() 方法可以渲染模板
     return render_template('login.html',msg=msg,next=request.values.get('next'))  #登录后通过next回到之前访问的页面
 
-#注册时的错误处理函数
+# 注册时的错误处理函数
 def redirect_with_msg(target,msg,category):
     if msg != None:
         flash(msg,category=category)
     return redirect(target)
 
-#登录页面,登录过程中验证用户名、密码和服务器中的是否一致
+# 登录页面,登录过程中验证用户名、密码和服务器中的是否一致
 @app.route('/login/',methods={'post','get'})
 def login():
     username = request.values.get('username').strip()
@@ -135,10 +143,11 @@ def reg():
     #request.args
     #request.form
     username = request.values.get('username').strip()  #strip 去除前后空格
+    usermail = request.values.get('usermail')
     password = request.values.get('password').strip()
 
-    if username == '' or password == '':
-        return redirect_with_msg('/regloginpage', u'用户名或密码不能为空', 'reglogin')
+    if username == '' or password == '' or usermail == '':
+        return redirect_with_msg('/regloginpage', u'用户名、密码、邮箱不能为空', 'reglogin')
 
     lengthofusername = len(username)
     if lengthofusername < 5 or lengthofusername > 16: #用户名长度应该大于4
@@ -152,6 +161,18 @@ def reg():
     user = User.query.filter_by(username=username).first()
     if user != None:
         return redirect_with_msg('/regloginpage',u'用户名已经存在','reglogin')
+
+    # 邮箱激活
+    lengthOfQQ = len(usermail)
+    if lengthOfQQ < 6 or lengthOfQQ > 11:
+        return redirect_with_msg('/regloginpage', u'请输入6到11位的QQ号', 'reglogin')
+    welcome = "Hello " + username
+    sender = app.config['FLASKY_MAIL_SENDER']
+    msg = Message(welcome,sender = sender,recipients=[usermail+'@qq.com'])
+    msg.body = "Dear"
+    msg.html = "<b>Congratulation!<br/>You have succeed to register!</b>"
+    print msg
+    mail.send(msg)
 
     #注册帐号更多判断
 
@@ -223,3 +244,7 @@ def add_comment():
                        "content":content,
                        "username":comment.user.username,
                        "user_id":comment.user.id})
+
+
+
+
