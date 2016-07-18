@@ -84,6 +84,14 @@ def user_images(user_id,page,per_page):
     map['images'] = images
     return json.dumps(map)
 
+#登录页面
+@app.route('/loginpage/')
+def loginpage():
+    msg = ''
+    for m in get_flashed_messages(with_categories=False, category_filter=['reglogin']):
+        msg = msg + m
+    # 使用 render_template() 方法可以渲染模板
+    return render_template('direct_login.html', msg=msg, next=request.values.get('next'))  # 登录后通过next回到之前访问的页面
 
 #注册登录页面
 @app.route('/regloginpage/')
