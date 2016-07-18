@@ -10,9 +10,9 @@ class Comment(db.Model):  #评论类包括评论内容，针对哪个用户的�
     image_id = db.Column(db.Integer,db.ForeignKey('image.id'))
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'))
     status = db.Column(db.Integer,default=0) # 0 正常 1 被删除
-    user = db.relationship('User') #将评论和User表关联起来
+    user = db.relationship('User') #采用relationship将评论和User表关联起来
 
-    def __init__(self,content,image_id,user_id): #构造函数
+    def __init__(self,content,image_id,user_id): #默认构造函数
         self.content = content
         self.image_id = image_id
         self.user_id = user_id
