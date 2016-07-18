@@ -76,7 +76,7 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
-    width:47%;
+    width:100%;
     -webkit-appearance:none;
     line-height:29px;
     padding:0 11px;
