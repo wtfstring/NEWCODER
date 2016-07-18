@@ -7,6 +7,7 @@ from flask_script import Manager
 from nowstagram.models import User,Image,Comment
 import random
 from sqlalchemy import or_,and_   #用于查询语句中条件的关联
+import unittest,tests
 
 
 manager = Manager(app)
@@ -14,6 +15,12 @@ manager = Manager(app)
 def get_image_url():
     return 'http://images.nowcoder.com/head/' + str(random.randint(0,1000)) + 'm.png'
     #return 'http://img.qqu.cc/uploads/allimg/160306/1-1603061G' + str(random.randint(0,1000)) + '.jpg'
+
+@manager.command
+def run_test():
+    tests = unittest.TestLoader().discover('./')
+    unittest.TextTestRunner().run(tests)
+
 
 @manager.command
 def init_database():
