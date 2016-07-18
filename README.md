@@ -1,2 +1,1 @@
-1.first lesson、seconde_lesson 为python相关语法练习
-2.nowstagram为图片分享网站的开发，运用python的Flask网页开发框架（主要是后台）
+first lesson、seconde_lesson y文件为python相关语法练习,nowstagram文件为图片分享网站的开发，运用python的Flask网页开发框架
