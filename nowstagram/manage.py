@@ -1,5 +1,7 @@
 # -*- encoding=UTF-8 -*-
 
+#此文件为运行脚本文件，初始化数据库等功能
+
 from nowstagram import app,db
 from flask_script import Manager
 from nowstagram.models import User,Image,Comment
