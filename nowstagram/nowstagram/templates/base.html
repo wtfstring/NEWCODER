@@ -17,9 +17,9 @@
 
                     <a class="logo" href="/">logo</a>
                     {% if current_user.is_authenticated %}
-                    <font face="宋体" color="blue" size="20px"> {{current_user.username}} 欢迎您！</font>
+                    <font face="楷体" color="blue" size="10"  > {{current_user.username}} 欢迎您！</font>
                     {% else %}
-                    <font face="宋体" color="blue" size="20px"> 欢迎访问！</font>
+                    <font face="楷体" color="#00bfff" size="10" > 欢迎！</font>
                     {% endif %}
                     <div class="web-menu">
                         {% if current_user.is_authenticated %}
