@@ -55,9 +55,8 @@ $(function () {
                 // 更新当前页面
                 that.page++;
                 // 渲染数据
-                var sHtm1 = '';
-                var sHtm2 = '';
-                var sHtm3 = '';
+                var sHtm1 ='';
+
                 $.each(oResult.images, function (nIndex, oImage) {
                     sHtm1 += that.tpl([
                         '<article class="mod">',
@@ -84,15 +83,18 @@ $(function () {
                                         '<a>',
                                             '<span>全部 </span><span class="">#{comment_count}</span>',
                                             '<span> 条评论</span></a>',
-                                    '</li>',
-                            /*].join(''),oImage);
+                                    '</li>'
+                            ].join(''),oImage);
 
+                            var sHtm2 = '';
+                                if (oImage.comment_count > 2)
+                                    oImage.comment_count = 2;
                                 for(var ni = 0; ni < oImage.comment_count; ni++) {
                                     dict = {'comment_username':oImage.comment_username[ni],
                                         'comment_user_id':oImage.comment_user_id[ni],
                                          'comment_content':oImage.comment_content[ni]
                                     };
-                                   sHtm2 += that.tp1([
+                                   sHtm2 += that.tpl([
                                         '<li>',
                                         '<a class="_4zhc5 _iqaka" title="#{comment_username}" href="/profile/#{comment_user_id}" data-reactid=".0.1.0.0.0.2.1.2:$comment-17856951190001917.1">#{comment_username}</a>',
                                         '<span>',
@@ -100,9 +102,10 @@ $(function () {
                                         '</span>',
                                         '</li>'
                                     ].join(''), dict);
-                                }
 
-                               sHtm3 = that.tp1([*/
+                                }
+                            var sHtm3 = '';
+                               sHtm3 = that.tpl([
                                 '</ul>',
                                 '<section class="discuss-edit">',
                                     '<a class="icon-heart"></a>',
@@ -115,7 +118,6 @@ $(function () {
                         '</article>'].join(''),oImage);
                     sHtm1 += sHtm2 + sHtm3;
                 });
-
                 sHtm1 && that.listEl.append(sHtm1);
 
             },
@@ -130,13 +132,13 @@ $(function () {
         var that = this;
         var sUrl = '/index/images/' + oConf.page + '/' + oConf.pageSize + '/';
         $.ajax({url: sUrl, dataType: 'json'}).done(oConf.call).fail(oConf.error).always(oConf.always);
-        $.getJSON('url', function(json) {
+       /* $.getJSON('url', function(json) {
             if (json.success) {
                 alert(json.data);
             } else {
                 alert('AJAX请求失败,请刷新页面重试');
-    }
-});
+
+            }});*/
     }
 
     function fTpl(sTpl, oData) {

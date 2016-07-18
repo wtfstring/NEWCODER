@@ -247,6 +247,22 @@ def add_comment():
                        "username":comment.user.username,
                        "user_id":comment.user.id})
 
+'''
+首页加载
+@app.route('/index/addcomment/',methods={'post'})
+def index_add_comment():
+    image_id = int(request.values['image_id'])
+    content = request.values['content'].strip()
+    comment = Comment(content,image_id,current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+    return json.dumps({"code":0,"id":comment.id,
+                       "content":content,
+                       "username":comment.user.username,
+                       "user_id":comment.user.id})
+ '''
+
+
 
 
 
