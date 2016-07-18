@@ -27,7 +27,7 @@ def profile(uid):
     #将参数传入模板中，本程序为profile.html;
     return render_template('profile.html',uid=uid,colors=colors,infos=infos)
 
-@app.route('/request')
+@app.route('/request/')
 def request_demo():
     key = request.args.get('key','default')
     res = request.args.get('key','default') + '<br/>'
@@ -59,7 +59,7 @@ def page_not_found(error):
     print error
     return render_template('not_found.html',url=request.url),404
 
-@app.route('/admin')
+@app.route('/admin/')
 def admin():
     key = request.args.get('key')
     if key == 'admin':

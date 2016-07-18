@@ -13,5 +13,5 @@ def initalize_database():
     'initialize database'
     print 'database...'
 
-if __name__ == '__main__':
+if __name__ == '__main__':    #执行脚本文件
     manager.run()
