@@ -163,6 +163,8 @@ def reg():
         return redirect_with_msg('/regloginpage',u'用户名已经存在','reglogin')
 
     # 邮箱激活
+    usermail = usermail.split('@')[0].strip()
+    #print usermail
     lengthOfQQ = len(usermail)
     if lengthOfQQ < 6 or lengthOfQQ > 11:
         return redirect_with_msg('/regloginpage', u'请输入6到11位的QQ号', 'reglogin')
