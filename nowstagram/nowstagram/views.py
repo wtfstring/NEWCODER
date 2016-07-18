@@ -171,7 +171,7 @@ def reg():
     msg = Message(welcome,sender = sender,recipients=[usermail+'@qq.com'])
     msg.body = "Dear"
     msg.html = "<b>Congratulation!<br/>You have succeed to register!</b>"
-    print msg
+    #print msg
     mail.send(msg)
 
     #注册帐号更多判断
